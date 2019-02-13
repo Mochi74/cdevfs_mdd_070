@@ -10,10 +10,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -82,7 +79,46 @@ public class Window extends Frame {
 
     }
 
+    private static class Mouse implements MouseMotionListener {
+
+        public Integer getMouseX() {
+            return mouseX;
+        }
+
+        public void setMouseX(Integer mouseX) {
+            this.mouseX = mouseX;
+        }
+
+        public Integer getMouseY() {
+            return mouseY;
+        }
+
+        public void setMouseY(Integer mouseY) {
+            this.mouseY = mouseY;
+        }
+
+        private Integer mouseX;
+        private Integer mouseY;
+
+        public Mouse() {
+
+        }
+
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            mouseX=e.getX();
+            mouseY=e.getY();
+        }
+    }
+
     private Keyboard keyboard;
+    private Mouse mouse;
     private int pacmanX;
     private int pacmanY;
 
@@ -108,7 +144,9 @@ public class Window extends Frame {
         add(canvas);
 
         keyboard = new Keyboard();
+        mouse= new Mouse();
         canvas.addKeyListener(keyboard);
+        canvas.addMouseMotionListener(mouse);
 
         pack();
     }
@@ -134,6 +172,7 @@ public class Window extends Frame {
         if (keyboard.isKeyPressed(KeyEvent.VK_UP)) {
             pacmanY --;
         }
+        System.out.println("mouse:"+ mouse.getMouseX()+":"+mouse.getMouseY());
     }
 
     private long lastUpdate;
@@ -164,6 +203,7 @@ public class Window extends Frame {
             g.setColor(Color.black);
             g.fillRect(0,0,canvasWidth,canvasHeight);
 
+            /* draw level */
             for (int j=0;j<levelHeight;j++) {
                 for (int i=0;i<levelWidth;i++) {
                     int tileIndex = level[j][i];
@@ -183,6 +223,7 @@ public class Window extends Frame {
                 }
             }
 
+            /* draw Pacman */
             int tileX = 0;
             int tileY = 2;
             g.drawImage(texture,
@@ -190,6 +231,19 @@ public class Window extends Frame {
                     tileX * tileWidth, tileY * tileHeight, tileX * tileWidth + tileWidth, tileY * tileHeight + tileHeight,
                     null
             );
+
+            /* draw Yellow square on mouse position */
+            tileX = 5;
+            tileY = 0;
+            if (mouse.getMouseX()!=null && mouse.getMouseX()!=null) {
+                int squareX = mouse.getMouseX();
+                int squareY = mouse.getMouseY();
+                g.drawImage(texture,
+                        squareX, squareY, squareX + tileWidth, squareY + tileHeight,
+                        tileX * tileWidth, tileY * tileHeight, tileX * tileWidth + tileWidth, tileY * tileHeight + tileHeight,
+                        null
+                );
+            }
 
             bs.show();
         }
